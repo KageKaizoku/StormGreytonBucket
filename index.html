@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storm & Greyton - Our Bucket List</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a0033 0%, #0d0d1a 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 20px;
+        }
+
+        h1 {
+            font-size: 2.8em;
+            color: #b366ff;
+            text-shadow: 0 0 15px rgba(179, 102, 255, 0.6);
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #999;
+            font-style: italic;
+            font-size: 1.1em;
+        }
+
+        .sync-status {
+            display: inline-block;
+            padding: 5px 12px;
+            background: #1a3d1a;
+            color: #4CAF50;
+            border-radius: 15px;
+            font-size: 0.85em;
+            margin-top: 10px;
+        }
+
+        .sync-status.syncing {
+            background: #3d2a1a;
+            color: #ff9800;
+        }
+
+        /* Input Section */
+        .input-section {
+            background: linear-gradient(135deg, #2a0052 0%, #1a001a 100%);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #b366ff;
+            margin-bottom: 40px;
+            box-shadow: 0 0 25px rgba(179, 102, 255, 0.3);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        #goalInput {
+            flex: 1;
+            padding: 15px 18px;
+            background: #0d0d1a;
+            border: 2px solid #333;
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 1.05em;
+            transition: border-color 0.3s ease;
+        }
+
+        #goalInput:focus {
+            outline: none;
+            border-color: #b366ff;
+        }
+
+        #addBtn {
+            padding: 15px 35px;
+            background: #b366ff;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.05em;
+        }
+
+        #addBtn:hover {
+            background: #c477ff;
+            transform: scale(1.05);
+        }
+
+        #addBtn:active {
+            transform: scale(0.98);
+        }
+
+        .person-select {
+            display: flex;
+            gap: 10px;
+        }
+
+        .person-btn {
+            flex: 1;
+            padding: 12px;
+            background: #1a001a;
+            border: 2px solid #555;
+            color: #999;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            font-size: 1em;
+        }
+
+        .person-btn.active {
+            background: #b366ff;
+            border-color: #b366ff;
+            color: #000;
+        }
+
+        /* Goals List */
+        .goals-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .goal-item {
+            background: linear-gradient(135deg, #2a0052 0%, #1a001a 100%);
+            border: 2px solid #444;
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .goal-item:hover {
+            border-color: #b366ff;
+            box-shadow: 0 0 20px rgba(179, 102, 255, 0.3);
+        }
+
+        .goal-item.completed {
+            opacity: 0.7;
+            background: linear-gradient(135deg, #1a3d1a 0%, #0d1a0d 100%);
+            border-color: #4CAF50;
+        }
+
+        .goal-item.completed .goal-text {
+            text-decoration: line-through;
+            color: #888;
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: #b366ff;
+        }
+
+        .goal-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .goal-text {
+            color: #e0e0e0;
+            font-size: 1.15em;
+            word-break: break-word;
+            line-height: 1.4;
+        }
+
+        .goal-meta {
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        .goal-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            background: #b366ff;
+            color: #000;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-edit, .btn-delete {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+        }
+
+        .btn-edit {
+            background: #b366ff;
+            color: #000;
+        }
+
+        .btn-edit:hover {
+            background: #c477ff;
+        }
+
+        .btn-delete {
+            background: #ff4466;
+            color: #fff;
+        }
+
+        .btn-delete:hover {
+            background: #ff5577;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #777;
+        }
+
+        .empty-state p {
+            font-size: 1.3em;
+            font-style: italic;
+        }
+
+        /* Edit Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #2a0052 0%, #1a001a 100%);
+            padding: 35px;
+            border-radius: 15px;
+            border: 2px solid #b366ff;
+            max-width: 450px;
+            width: 90%;
+        }
+
+        .modal-content h2 {
+            color: #b366ff;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 15px 18px;
+            background: #0d0d1a;
+            border: 2px solid #333;
+            border-radius: 8px;
+            color: #e0e0e0;
+            margin-bottom: 25px;
+            font-size: 1.05em;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: #b366ff;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+
+        .save-btn {
+            background: #b366ff;
+            color: #000;
+        }
+
+        .save-btn:hover {
+            background: #c477ff;
+        }
+
+        .cancel-btn {
+            background: #333;
+            color: #e0e0e0;
+        }
+
+        .cancel-btn:hover {
+            background: #444;
+        }
+
+        /* Stats */
+        .stats {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, #2a0052 0%, #1a001a 100%);
+            border-radius: 12px;
+            border: 2px solid #b366ff;
+            color: #b366ff;
+            font-size: 1.05em;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2.2em;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .goal-item {
+                flex-wrap: wrap;
+            }
+
+            .actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚡🖤Storm & Greyton💜⚡</h1>
+            <p class="subtitle">Our Bucket List - Dreams We'll Make Real</p>
+            <div class="sync-status" id="syncStatus">🔄 Connecting...</div>
+        </header>
+
+        <div class="input-section">
+            <div class="person-select">
+                <button class="person-btn active" data-person="Storm">Storm</button>
+                <button class="person-btn" data-person="Greyton">Greyton</button>
+            </div>
+            <div class="input-group">
+                <input type="text" id="goalInput" placeholder="Add a dream to our list...">
+                <button id="addBtn">Add Goal</button>
+            </div>
+        </div>
+
+        <div id="goalsList" class="goals-list"></div>
+
+        <div class="empty-state" id="emptyState">
+            <p>💜⚡🖤Add Add Add 🖤⚡💜</p>
+        </div>
+
+        <div class="stats" id="stats"></div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <h2>Edit Goal</h2>
+            <input type="text" id="editInput" class="modal-input" placeholder="Edit your goal...">
+            <div class="modal-buttons">
+                <button class="save-btn" id="saveEditBtn">Save</button>
+                <button class="cancel-btn" id="cancelEditBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAUILZ_RwvA8CbLRdpL2Hj_BQL0utz9ZtA",
+            authDomain: "stormgreytonbucket.firebaseapp.com",
+            projectId: "stormgreytonbucket",
+            storageBucket: "stormgreytonbucket.firebasestorage.app",
+            messagingSenderId: "120110777078",
+            appId: "1:120110777078:web:a72aeaab968e26f14d22d7",
+            measurementId: "G-FRW557JF0F"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const goalsCollection = collection(db, 'goals');
+
+        // DOM elements
+        const goalInput = document.getElementById('goalInput');
+        const addBtn = document.getElementById('addBtn');
+        const goalsList = document.getElementById('goalsList');
+        const emptyState = document.getElementById('emptyState');
+        const personBtns = document.querySelectorAll('.person-btn');
+        const statsDiv = document.getElementById('stats');
+        const editModal = document.getElementById('editModal');
+        const editInput = document.getElementById('editInput');
+        const saveEditBtn = document.getElementById('saveEditBtn');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const syncStatus = document.getElementById('syncStatus');
+
+        let currentPerson = 'Storm';
+        let editingId = null;
+        let goals = [];
+
+        // Person selection
+        personBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                personBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentPerson = btn.dataset.person;
+            });
+        });
+
+        // Add goal
+        addBtn.addEventListener('click', addGoal);
+        goalInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addGoal();
+        });
+
+        async function addGoal() {
+            const text = goalInput.value.trim();
+            if (text === '') return;
+
+            try {
+                syncStatus.textContent = '🔄 Syncing...';
+                syncStatus.className = 'sync-status syncing';
+
+                await addDoc(goalsCollection, {
+                    text: text,
+                    completed: false,
+                    person: currentPerson,
+                    createdAt: new Date().toISOString(),
+                    timestamp: Date.now()
+                });
+
+                goalInput.value = '';
+                goalInput.focus();
+            } catch (error) {
+                console.error('Error adding goal:', error);
+                alert('Failed to add goal. Please try again.');
+            }
+        }
+
+        // Delete goal
+        async function deleteGoal(id) {
+            try {
+                await deleteDoc(doc(db, 'goals', id));
+            } catch (error) {
+                console.error('Error deleting goal:', error);
+                alert('Failed to delete goal. Please try again.');
+            }
+        }
+
+        // Toggle complete
+        async function toggleComplete(id) {
+            const goal = goals.find(g => g.id === id);
+            if (goal) {
+                try {
+                    const updates = {
+                        completed: !goal.completed
+                    };
+                    
+                    if (!goal.completed) {
+                        updates.completedAt = new Date().toISOString();
+                    } else {
+                        updates.completedAt = null;
+                    }
+
+                    await updateDoc(doc(db, 'goals', id), updates);
+                } catch (error) {
+                    console.error('Error updating goal:', error);
+                    alert('Failed to update goal. Please try again.');
+                }
+            }
+        }
+
+        // Edit goal
+        function editGoal(id) {
+            editingId = id;
+            const goal = goals.find(g => g.id === id);
+            editInput.value = goal.text;
+            editModal.classList.add('active');
+            editInput.focus();
+        }
+
+        saveEditBtn.addEventListener('click', async () => {
+            const newText = editInput.value.trim();
+            if (newText && editingId) {
+                try {
+                    await updateDoc(doc(db, 'goals', editingId), {
+                        text: newText
+                    });
+                    editModal.classList.remove('active');
+                    editingId = null;
+                } catch (error) {
+                    console.error('Error editing goal:', error);
+                    alert('Failed to edit goal. Please try again.');
+                }
+            }
+        });
+
+        cancelEditBtn.addEventListener('click', () => {
+            editModal.classList.remove('active');
+            editingId = null;
+        });
+
+        // Real-time listener
+        const q = query(goalsCollection, orderBy('timestamp', 'desc'));
+        onSnapshot(q, (snapshot) => {
+            goals = [];
+            snapshot.forEach((doc) => {
+                goals.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+            
+            syncStatus.textContent = '🖤✅💜 Synced';
+            syncStatus.className = 'sync-status';
+            render();
+        }, (error) => {
+            console.error('Error listening to goals:', error);
+            syncStatus.textContent = '⚠️ Connection error';
+            syncStatus.className = 'sync-status syncing';
+        });
+
+        // Render goals
+        function render() {
+            goalsList.innerHTML = '';
+
+            if (goals.length === 0) {
+                emptyState.style.display = 'block';
+                statsDiv.innerHTML = 'Óur journey together! 🖤💜';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+
+            goals.forEach(goal => {
+                const div = document.createElement('div');
+                div.className = `goal-item ${goal.completed ? 'completed' : ''}`;
+
+                const createdDate = new Date(goal.createdAt).toLocaleDateString();
+                const statusText = goal.completed 
+                    ? `✅ Achieved on ${new Date(goal.completedAt).toLocaleDateString()}` 
+                    : `Added ${createdDate}`;
+
+                div.innerHTML = `
+                    <input type="checkbox" class="checkbox" ${goal.completed ? 'checked' : ''}>
+                    <div class="goal-content">
+                        <div class="goal-text">${escapeHtml(goal.text)}</div>
+                        <div class="goal-meta">
+                            <span class="goal-badge">${goal.person}</span>
+                            ${statusText}
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <button class="btn-edit">Edit</button>
+                        <button class="btn-delete">Delete</button>
+                    </div>
+                `;
+
+                // Event listeners
+                div.querySelector('.checkbox').addEventListener('change', () => toggleComplete(goal.id));
+                div.querySelector('.btn-edit').addEventListener('click', () => editGoal(goal.id));
+                div.querySelector('.btn-delete').addEventListener('click', () => {
+                    if (confirm('Delete this goal?')) deleteGoal(goal.id);
+                });
+
+                goalsList.appendChild(div);
+            });
+
+            updateStats();
+        }
+
+        function updateStats() {
+            const completed = goals.filter(g => g.completed).length;
+            const total = goals.length;
+            const stormGoals = goals.filter(g => g.person === 'Storm').length;
+            const greytonGoals = goals.filter(g => g.person === 'Greyton').length;
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+            statsDiv.innerHTML = `
+                ✨ ${completed}/${total} dreams achieved (${percentage}%) | 
+                ⚡ Storm: ${stormGoals} | 
+                🤘 Greyton: ${greytonGoals}
+            `;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Make functions available globally
+        window.toggleComplete = toggleComplete;
+        window.editGoal = editGoal;
+        window.deleteGoal = deleteGoal;
+    </script>
+</body>
+</html>
